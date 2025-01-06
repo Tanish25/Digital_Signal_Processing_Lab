@@ -1,0 +1,49 @@
+% Clear command window
+clc;
+
+% Clear all variables and close all open figures
+clear all; close all;
+
+%signal 1 length
+Lh = 10; 
+%indices of signal 1
+n=1:Lh;
+%signal 1
+h(n)=2*n;
+%signal 2
+Lx=8;
+n=1:Lx;
+x(n)=sin(n);
+
+h1=h(end:-1:1);
+y = zeros(1,Lx+Lh-1);
+x1 = zeros(1,Lx+2*Lh-1); 
+x1(Lh:Lh+Lx-1) = x;
+for ii = 1:length(y)  
+    y(ii) = sum(x1(ii:length(h1)+ii-1).*h1);
+end
+
+%M point circular convolution
+M = 100;
+x_m = zeros(1, M);
+h_m = zeros(1, M);
+x_m(1:Lx) = x;
+h_m(1:Lh) = h;
+
+matrix_x = zeros(M, M);
+
+curr_array = x_m;
+
+for i=1:M
+
+    matrix_x(1:M, i) = curr_array;
+    new_array = zeros(1, M);
+    new_array(1) = curr_array(end);
+    new_array(2:end) = curr_array(1:end-1);
+    curr_array = new_array;
+
+end
+
+output = matrix_x * h_m';
+output_new = cconv(x,h,M);
+difference = sum(output_new'-output);
